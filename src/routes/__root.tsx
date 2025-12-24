@@ -3,6 +3,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
+import Header from '@/components/Header'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -15,7 +16,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'StackShop App',
       },
     ],
     links: [
@@ -35,8 +36,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
+
       <body>
-        {children}
+        <div className="min-h-screen bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-white">
+          <Header />
+
+          <main className="mx-auto max-w-6xl px-4 py-6">
+            {children}
+          </main>
+        </div>
+
         <TanStackDevtools
           config={{
             position: 'bottom-right',

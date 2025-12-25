@@ -1,32 +1,128 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowRight } from "@hugeicons/core-free-icons";
+import { ArrowRight, ArrowRightIcon } from "@hugeicons/core-free-icons";
+import { createServerFn, json } from "@tanstack/react-start";
+import { sampleProducts } from "@/db/seed";
+import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/")({ component: App });
+// const fetchProductsFn = createServerFn({ method: 'GET' }).handler(async () => {
+//   const response = await fetch('https://fakestoreapi.com/products')
+//   const data = await response.json()
+//   console.log('data', data)
+//   return { products: data }
+// })
 
-function App() {
-return (
-  <div className="space-y-12 bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
-    <section>
-      <Card className="p-8 shadow-md bg-white/80">
-        <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
-          Your favourite e-commerce store
-        </p>
-        <CardTitle className="text-4xl font-bold leading-tight text-slate-900 dark:text-white max-w-2xl">
-          <h1>StartShop - Your one-stop shop for all your needs</h1>
-        </CardTitle>
-        <CardDescription>
-          <Link
-            to="/products"
-            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
-          >
-            Browse products
-            <HugeiconsIcon icon={ArrowRight} size={20} />
-          </Link>
-        </CardDescription>
-      </Card>
-    </section>
-  </div>
-);
+const fetchProductsFn = createServerFn({ method: 'GET' }).handler(async () => {
+  return { products: sampleProducts }
+})
+
+
+export const Route = createFileRoute("/")({
+  component: App,
+  loader: async () => {
+    // This runs on server during SSR AND on client during navigation
+    return fetchProductsFn()
+  }
+});
+
+const inventoryTone = {
+  'in-stock': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+  backorder: 'bg-amber-50 text-amber-700 border-amber-100',
+  preorder: 'bg-indigo-50 text-indigo-700 border-indigo-100',
+}
+
+export function App() {
+
+  const { products } = Route.useLoaderData()
+
+  return (
+    <div className="space-y-12 bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
+      <section>
+        <Card className="p-8 shadow-md bg-white/80">
+          <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
+            Your favourite e-commerce store
+          </p>
+          <CardTitle className="text-4xl font-bold leading-tight text-slate-900 dark:text-white max-w-2xl">
+            <h1>StartShop - Your one-stop shop for all your needs</h1>
+          </CardTitle>
+          <CardDescription>
+            <Link
+              to="/products"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              Browse products
+              <HugeiconsIcon icon={ArrowRight} size={20} />
+            </Link>
+          </CardDescription>
+        </Card>
+      </section>
+
+      <section className="space-y-4 max-w-6xl mx-auto">
+        <Card className="p-6 shadow-md bg-white/80">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardHeader  className="px-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                  Recommended
+                </p>
+                <CardTitle className="text-2xl font-semibold text-slate-900">
+                  Starter picks from the catalog
+                </CardTitle>
+              </CardHeader>
+              <CardDescription className="text-sm text-slate-600">
+                Curated items to try the cart and detail pages quickly.
+              </CardDescription>
+            </div>
+            <div>
+              <Link
+                to="/products"
+                className="hidden items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 sm:inline-flex transition hover:-translate-y-0.5 hover:shadow-xl"
+              >
+                View All <HugeiconsIcon icon={ArrowRight} size={20} />
+              </Link>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+            {products.map((product, index) => (
+              <Card key={index} className="px-2 py-4">
+                <CardHeader className="gap-2">
+                  <div className="flex items-center gap-2">
+                    {product.badge && (
+                      <span className="rounded-full bg-slate-900 px-2 py-0.5 text-xs font-semibold text-white">
+                        {product.badge}
+                      </span>
+                    )}
+                  </div>
+                  <CardTitle className="text-lg font-semibold">
+                    {product.name}
+                  </CardTitle>
+                  <CardDescription>{product.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent className="flex items-center justify-between">
+                  <p className="flex items-center gap-2 text-sm text-slate-600">
+                    <span className="font-semibold">{product.rating}</span>
+                    <span className="text-slate-400">({product.reviews} reviews)</span>
+                  </p>
+                  <span
+                    className={cn(
+                      'rounded-full border px-3 py-1 text-xs font-semibold',
+                      inventoryTone[product.inventory as keyof typeof inventoryTone],
+                    )}
+                  >
+                    {product.inventory === 'in-stock'
+                      ? 'In Stock'
+                      : product.inventory === 'backorder'
+                        ? 'Backorder'
+                        : 'Preorder'}
+                  </span>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </Card>
+      </section>
+    </div>
+  );
 }

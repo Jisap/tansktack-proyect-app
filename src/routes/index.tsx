@@ -5,6 +5,7 @@ import { ArrowRight, ArrowRightIcon } from "@hugeicons/core-free-icons";
 import { createServerFn, json } from "@tanstack/react-start";
 import { sampleProducts } from "@/db/seed";
 import { cn } from "@/lib/utils";
+import ProductCard from "@/components/Product-card";
 
 // const fetchProductsFn = createServerFn({ method: 'GET' }).handler(async () => {
 //   const response = await fetch('https://fakestoreapi.com/products')
@@ -85,40 +86,10 @@ export function App() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
             {products.map((product, index) => (
-              <Card key={index} className="px-2 py-4">
-                <CardHeader className="gap-2">
-                  <div className="flex items-center gap-2">
-                    {product.badge && (
-                      <span className="rounded-full bg-slate-900 px-2 py-0.5 text-xs font-semibold text-white">
-                        {product.badge}
-                      </span>
-                    )}
-                  </div>
-                  <CardTitle className="text-lg font-semibold">
-                    {product.name}
-                  </CardTitle>
-                  <CardDescription>{product.description}</CardDescription>
-                </CardHeader>
-
-                <CardContent className="flex items-center justify-between">
-                  <p className="flex items-center gap-2 text-sm text-slate-600">
-                    <span className="font-semibold">{product.rating}</span>
-                    <span className="text-slate-400">({product.reviews} reviews)</span>
-                  </p>
-                  <span
-                    className={cn(
-                      'rounded-full border px-3 py-1 text-xs font-semibold',
-                      inventoryTone[product.inventory as keyof typeof inventoryTone],
-                    )}
-                  >
-                    {product.inventory === 'in-stock'
-                      ? 'In Stock'
-                      : product.inventory === 'backorder'
-                        ? 'Backorder'
-                        : 'Preorder'}
-                  </span>
-                </CardContent>
-              </Card>
+              <ProductCard 
+                product={product} 
+                key={`product-${index}`} 
+              />
             ))}
           </div>
         </Card>

@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router"
 import { Button } from "./ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ShoppingBagIcon } from "@hugeicons/core-free-icons"
+import { ProductSelect } from "@/db/schema"
 
 const inventoryTone = {
   'in-stock': 'bg-emerald-50 text-emerald-600 border-emerald-100',
@@ -14,16 +15,7 @@ const inventoryTone = {
 
 
 const ProductCard = ({ product }: {
-  product: {
-    name: string
-    description: string
-    price: string
-    badge?: string
-    rating: string
-    reviews: number
-    inventory: string
-    image: string
-  }
+  product: ProductSelect
 }) => {
   return (
     <Link 
@@ -55,7 +47,7 @@ const ProductCard = ({ product }: {
           <span
             className={cn(
               'rounded-full border px-3 py-1 text-xs font-semibold',
-              inventoryTone[product.inventory as keyof typeof inventoryTone],
+              inventoryTone[product.inventory],
             )}
           >
             {product.inventory === 'in-stock'

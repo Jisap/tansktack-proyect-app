@@ -1,37 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowRight, ArrowRightIcon } from "@hugeicons/core-free-icons";
-import { createServerFn, json } from "@tanstack/react-start";
-import { sampleProducts } from "@/db/seed";
-import { cn } from "@/lib/utils";
+import { ArrowRight } from "@hugeicons/core-free-icons";
 import ProductCard from "@/components/Product-card";
+import { getRecommendedProducts } from "@/data/products";
 
-// const fetchProductsFn = createServerFn({ method: 'GET' }).handler(async () => {
-//   const response = await fetch('https://fakestoreapi.com/products')
-//   const data = await response.json()
-//   console.log('data', data)
-//   return { products: data }
-// })
-
-const fetchProductsFn = createServerFn({ method: 'GET' }).handler(async () => {
-  return { products: sampleProducts }
-})
 
 
 export const Route = createFileRoute("/")({
   component: App,
   loader: async () => {
     // This runs on server during SSR AND on client during navigation
-    return fetchProductsFn()
+    const products = await getRecommendedProducts();
+    return { products }
   }
 });
 
-const inventoryTone = {
-  'in-stock': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-  backorder: 'bg-amber-50 text-amber-700 border-amber-100',
-  preorder: 'bg-indigo-50 text-indigo-700 border-indigo-100',
-}
 
 export function App() {
 

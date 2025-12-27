@@ -20,7 +20,7 @@ const ProductCard = ({ product }: {
   return (
     <Link 
       to="/products/$id"
-      params={{ id: "0" }}
+      params={{ id: product.id }}
       className="cursor-pointer h-full hover:-translate-y-1
      hover:shadow-lg transition"
     >

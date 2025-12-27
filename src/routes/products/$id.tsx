@@ -1,13 +1,15 @@
-import { sampleProducts } from 'scripts/seed'
+
 import { createFileRoute } from '@tanstack/react-router'
+import { getProductById } from '@/data/products'
 
 export const Route = createFileRoute('/products/$id')({
   component: RouteComponent,
   loader: async ({ params }) => {
-    return sampleProducts.find((product) => product.id === params.id)
+    return await getProductById(params.id)
   },
 })
 
 function RouteComponent() {
-  return <div>Hello "/products/$id"!</div>
+  const { id } = Route.useParams()
+  return <div>Hello "/products/$id"! { id }</div>
 }

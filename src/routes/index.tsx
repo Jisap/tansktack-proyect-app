@@ -85,7 +85,7 @@ export function App() {
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-            {products.map((product, index) => (
+            {products.slice(0,6).map((product, index) => (
               <ProductCard 
                 product={product} 
                 key={`product-${index}`} 

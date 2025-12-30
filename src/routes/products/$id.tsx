@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeftIcon, SparklesIcon } from '@hugeicons/core-free-icons'
 import { RecommendedProducts } from '@/components/RecommendedProducts'
+import { ProductSelect } from '@/db/schema'
 
 
 
@@ -14,7 +15,7 @@ import { RecommendedProducts } from '@/components/RecommendedProducts'
 export const Route = createFileRoute('/products/$id')({
   component: RouteComponent,
   loader: async ({ params }) => {
-    const recommendedProducts = await getRecommendedProducts()
+    const recommendedProducts = getRecommendedProducts(); // Si no ponemos await la función devuelve una promesa
     const product = await getProductById(params.id)
     if (!product) {
       throw notFound()
@@ -22,7 +23,10 @@ export const Route = createFileRoute('/products/$id')({
     return { product, recommendedProducts }
   },
   head: async({ loaderData: data }) => {
-    const { product } = data || {}
+    const { product } = data as {
+      product: ProductSelect
+      recommendedProducts: Promise<ProductSelect[]> // Aqui el tipado como promesa
+    }
     if(!product){
       return {}
     }

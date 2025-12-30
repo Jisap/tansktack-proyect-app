@@ -41,6 +41,29 @@ export function ProductCard({ product }: { product: ProductSelect }) {
           </CardTitle>
           <CardDescription>{product.description}</CardDescription>
         </CardHeader>
+
+        <CardContent className="flex items-center justify-between">
+          <p className="flex items-center gap-2 text-sm text-slate-600">
+            <span className="font-semibold">{product.rating}</span>
+            <span className="text-slate-400">({product.reviews} reviews)</span>
+          </p>
+          <span
+            className={cn(
+              'rounded-full border px-3 py-1 text-xs font-semibold',
+              inventoryTone[product.inventory as keyof typeof inventoryTone],
+            )}
+          >
+            {product.inventory === 'in-stock'
+              ? 'In Stock'
+              : product.inventory === 'backorder'
+                ? 'Backorder'
+                : 'Preorder'}
+          </span>
+        </CardContent>
+
+        <CardFooter className="pt-0 flex items-center justify-between border-t-0 bg-transparent">
+          <span className="text-lg font-semibold">${product.price}</span>
+        </CardFooter>
       </Card>
     </Link>
   )

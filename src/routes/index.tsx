@@ -3,7 +3,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight } from "@hugeicons/core-free-icons";
 import ProductCard from "@/components/Product-card";
-import { getRecommendedProducts } from "@/data/products";
+
 
 
 
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/")({
   component: App,
   loader: async () => {
     // This runs on server during SSR AND on client during navigation
+    const { getRecommendedProducts } = await import('@/data/products');
     const products = await getRecommendedProducts();
     return { products }
   }

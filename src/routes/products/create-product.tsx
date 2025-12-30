@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form'
 import { BadgeValue, InventoryValue } from '@/db/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { FieldError } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/products/create-product')({
   component: RouteComponent,
@@ -43,6 +44,9 @@ type CreateProductData = {
 
 
 function RouteComponent() {
+
+  const navigate = useNavigate()
+  const router = useRouter()
   
   const form = useForm({
     defaultValues: {
@@ -68,7 +72,7 @@ function RouteComponent() {
       // TODO: Implement form submission
     },
   })
-  
+
   return (
     <div className="mx-auto max-w-7xl py-8 px-4">
       <div className="space-y-6">
@@ -87,6 +91,7 @@ function RouteComponent() {
               onSubmit={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
+                console.log('submitting...')
                 form.handleSubmit()
               }}
               className="space-y-6"
@@ -191,6 +196,7 @@ function RouteComponent() {
                   </div>
                 )}
               </form.Field>
+
               <form.Field name="inventory">
                 {(field) => (
                   <div className="space-y-2">
@@ -214,6 +220,37 @@ function RouteComponent() {
                   </div>
                 )}
               </form.Field>
+
+              {/* form.Subscribe es un componente que te permite suscribirte a cambios específicos del estado del formulario. 
+                  Evita que toda la página se recargue cada vez que se actualiza el estado del formulario.
+              */}
+              <form.Subscribe
+                // 1. EL SELECTOR:
+                // Aquí le dices: "Solo avísame si cambian 'canSubmit' o 'isSubmitting'"
+                selector={(state) => [state.canSubmit, state.isSubmitting]}
+              >
+                {/* 2. EL RENDER PROP:
+                Recibes los valores actuales de esas dos variables */}
+                {([canSubmit, isSubmitting]) => (
+                  <div className="flex gap-4">
+                    {/* Se usan las variables para controlar la UI. */}
+                    <Button
+                      type="submit"
+                      disabled={!canSubmit || isSubmitting}
+                      className="flex-1"
+                    >
+                      {isSubmitting ? 'Creating...' : 'Create Product'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={'outline'}
+                      onClick={() => navigate({ to: '/products' })}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
+              </form.Subscribe>
               </form>
           </CardContent>
         </Card>

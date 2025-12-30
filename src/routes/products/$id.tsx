@@ -1,6 +1,5 @@
 
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
-import { getProductById, getRecommendedProducts } from '@/data/products'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeftIcon, SparklesIcon } from '@hugeicons/core-free-icons'
@@ -17,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 export const Route = createFileRoute('/products/$id')({
   component: RouteComponent,
   loader: async ({ params }) => {
+    const { getRecommendedProducts, getProductById } = await import('@/data/products');
     const recommendedProducts = getRecommendedProducts(); // Si no ponemos await la función devuelve una promesa
     const product = await getProductById(params.id)
     if (!product) {

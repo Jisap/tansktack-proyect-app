@@ -3,12 +3,13 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute} from '@tanstack/react-router'
 import { createMiddleware, createServerFn, json } from '@tanstack/react-start'
-import { getAllProducts } from '@/data/products'
+
 
 
 const fetchProductsFn = createServerFn({ method: 'GET' }).handler(async () => {
-  const allProducts = await getAllProducts()
-  return { products: allProducts }
+  const { getAllProducts } = await import('@/data/products');
+  const data = await getAllProducts()
+  return { data }
 })
 
 const loggerMiddleware = createMiddleware().server(
@@ -43,17 +44,15 @@ export const Route = createFileRoute('/products/')({
 
 function RouteComponent() {
 
-  const { products } = Route.useLoaderData();
+  const  products  = Route.useLoaderData();
 
-  const { data } = useQuery({
+  const { data: productsList } = useQuery({
     queryKey: ['products'],
-    queryFn: async () => {
-      const data = await fetchProductsFn() //fetchProductsFn devuelve un objeto data
-      return data.products                 // Hay devolver un array de productos para que coincida con initialData
-    },
-    initialData: products,                 // InitialData devuelve un array de productos
+    queryFn: async () => fetchProductsFn(), // Devuelve un objeto { data: Product[] }
+    initialData: products,                  // Datos iniciales del loader (SSR), misma estructura { data: Product[] }
+    select: (data) => data.data,            // Extrae el array para que el componente reciba directamente Product[]
   })
-  console.log('---data--', data)
+  console.log('---data--', productsList)
 
   return (
     <div className='space-y-6'>
@@ -79,7 +78,7 @@ function RouteComponent() {
 
       <section>
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6'>
-          {data?.map((product, index) => (
+          {productsList?.map((product, index) => (
             <ProductCard 
               product={product} 
               key={`product-${index}`} 

@@ -14,9 +14,7 @@ const inventoryTone = {
 
 
 
-const ProductCard = ({ product }: {
-  product: ProductSelect
-}) => {
+const ProductCard = ({ product }: { product: ProductSelect }) => {
   return (
     <Link 
       to="/products/$id"

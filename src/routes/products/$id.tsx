@@ -1,15 +1,46 @@
 
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { getProductById } from '@/data/products'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeftIcon, SparklesIcon } from '@hugeicons/core-free-icons'
+import { ProductSelect } from '@/db/schema'
 
 export const Route = createFileRoute('/products/$id')({
   component: RouteComponent,
   loader: async ({ params }) => {
-    return await getProductById(params.id)
+    const product = await getProductById(params.id)
+    if (!product) {
+      throw notFound()
+    }
+    return product
   },
+  head: async({ loaderData: product }) => {
+    if(!product){
+      return {}
+    }
+    return {
+      meta: [
+        { name: 'description', content: product?.description },
+        { name: 'image', content: product?.image },
+        { name: 'title', content: product?.name },
+        {
+          name: 'canonical',
+          content:
+            process.env.NODE_ENV === 'production'
+              ? `https://stackshop-prod.appwrite.network/products/${product?.id}`
+              : `http://localhost:3000/products/${product?.id}` ||
+              `localhost:3000/products/${product?.id}`,
+        },
+        {
+          title: product?.name,
+        },
+        {
+          description: product?.description,
+        },
+      ]
+    }
+  }
 })
 
 function RouteComponent() {

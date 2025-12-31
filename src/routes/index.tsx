@@ -3,24 +3,27 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight } from "@hugeicons/core-free-icons";
 import ProductCard from "@/components/Product-card";
+import { createServerFn } from "@tanstack/react-start";
 
 
-
+const fetchProductsFn = createServerFn({ method: 'GET' }).handler(async () => {
+  const { getRecommendedProducts } = await import('@/data/products')
+  const products = await getRecommendedProducts()
+  return products
+})
 
 export const Route = createFileRoute("/")({
   component: App,
   loader: async () => {
     // This runs on server during SSR AND on client during navigation
-    const { getRecommendedProducts } = await import('@/data/products');
-    const products = await getRecommendedProducts();
-    return { products }
+    return fetchProductsFn()
   }
 });
 
 
 export function App() {
 
-  const { products } = Route.useLoaderData()
+  const products = Route.useLoaderData()
 
   return (
     <div className="space-y-12 bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">

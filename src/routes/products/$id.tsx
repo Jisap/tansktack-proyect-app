@@ -1,4 +1,3 @@
-
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -7,6 +6,7 @@ import { RecommendedProducts } from '@/components/RecommendedProducts'
 import { ProductSelect } from '@/db/schema'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { createServerFn } from '@tanstack/react-start'
 
 
 
@@ -24,12 +24,12 @@ export const Route = createFileRoute('/products/$id')({
     }
     return { product, recommendedProducts }
   },
-  head: async({ loaderData: data }) => {
+  head: async ({ loaderData: data }) => {
     const { product } = data as {
       product: ProductSelect
       recommendedProducts: Promise<ProductSelect[]> // Aqui el tipado como promesa
     }
-    if(!product){
+    if (!product) {
       return {}
     }
     return {
@@ -57,7 +57,7 @@ export const Route = createFileRoute('/products/$id')({
 })
 
 function RouteComponent() {
-  
+
   const { id } = Route.useParams();
   const data = Route.useLoaderData();
   const { product, recommendedProducts } = data;
@@ -103,13 +103,13 @@ function RouteComponent() {
 
               <CardContent className="flex items-start flex-col space-y-4">
                 <CardDescription className="text-lg">
-                {product?.description}
+                  {product?.description}
                 </CardDescription>
 
                 <div className="flex items-center gap-3">
                   <span className="text-3xl font-bold">${product?.price}</span>
                   <span className="text-sm text-slate-500">
-                  Rated {product?.rating.toString()} ({product.reviews}{' '}
+                    Rated {product?.rating.toString()} ({product.reviews}{' '}
                     reviews)
                   </span>
                 </div>
@@ -133,7 +133,7 @@ function RouteComponent() {
           </div>
         </Card>
 
-        <Suspense 
+        <Suspense
           fallback={
             <div>
               <h2 className="text-2xl font-bold my-4">

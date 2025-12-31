@@ -1,5 +1,5 @@
 import { db } from "@/db"
-import { products } from "@/db/schema"
+import { ProductInsert, products, ProductSelect } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function getAllProducts() {
@@ -33,5 +33,24 @@ export async function getProductById(id: string) {
   } catch (error) {
     console.error('Error getting product by id:', error)
     return null
+  }
+}
+
+export async function createProduct(
+  data: ProductInsert,
+): Promise<ProductSelect> {
+  try {
+    const result = await db.insert(products).values(data).returning()
+    const product = result[0]
+    if (!product) {
+      throw new Error(
+        'Failed to create product: no product returned from database',
+      )
+    }
+
+    return product
+  } catch (error) {
+    console.error('Error creating product', error)
+    throw error
   }
 }

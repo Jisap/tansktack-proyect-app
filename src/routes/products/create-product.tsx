@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form'
-import { BadgeValue, InventoryValue } from '@/db/schema';
+import { BadgeValue, InventoryValue, ProductInsert, ProductSelect } from '@/db/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { FieldError } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { createServerFn } from '@tanstack/react-start';
 
 export const Route = createFileRoute('/products/create-product')({
   component: RouteComponent,
@@ -42,12 +43,28 @@ type CreateProductData = {
   inventory: 'in-stock' | 'backorder' | 'preorder'
 }
 
+const createProductServerFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: CreateProductData) => data)
+  .handler(async ({ data }): Promise<ProductSelect> => {
+    //
+    const { createProduct } = await import('@/data/products')
+    const productData: ProductInsert = {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      image: data.image,
+      badge: data.badge ?? null,
+      inventory: data.inventory,
+    }
+    return createProduct(productData)
+  })
+
 
 function RouteComponent() {
 
   const navigate = useNavigate()
   const router = useRouter()
-  
+
   const form = useForm({
     defaultValues: {
       name: '',
@@ -69,7 +86,24 @@ function RouteComponent() {
       },
     },
     onSubmit: async ({ value }) => {
-      // TODO: Implement form submission
+      try {
+        await createProductServerFn({
+          data: {
+            name: value.name,
+            description: value.description,
+            price: value.price,
+            image: value.image,
+            badge: value.badge,
+            inventory: value.inventory,
+          },
+        })
+
+        await router.invalidate({ sync: true })
+
+        navigate({ to: '/products' })
+      } catch (error) {
+        console.error('Error creating product', error)
+      }
     },
   })
 
@@ -251,7 +285,7 @@ function RouteComponent() {
                   </div>
                 )}
               </form.Subscribe>
-              </form>
+            </form>
           </CardContent>
         </Card>
       </div>

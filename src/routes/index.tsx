@@ -48,7 +48,7 @@ export function App() {
         <Card className="p-6 shadow-md bg-white/80">
           <div className="flex items-center justify-between">
             <div>
-              <CardHeader  className="px-0">
+              <CardHeader className="px-0">
                 <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
                   Recommended
                 </p>
@@ -70,10 +70,10 @@ export function App() {
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-            {products.slice(0,6).map((product, index) => (
-              <ProductCard 
-                product={product} 
-                key={`product-${index}`} 
+            {products.slice(0, 6).map((product, index) => (
+              <ProductCard
+                product={product}
+                key={`product-${index}`}
               />
             ))}
           </div>

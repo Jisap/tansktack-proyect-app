@@ -3,8 +3,8 @@ import { ProductSelect } from '@/db/schema'
 import { use } from 'react'
 import ProductCard from './Product-card';
 
-export function RecommendedProducts({ recommendedProducts }: {recommendedProducts: Promise<ProductSelect[]> }) {
- 
+export function RecommendedProducts({ recommendedProducts }: { recommendedProducts: Promise<ProductSelect[]> }) {
+
   const recommendedProductsData = use(recommendedProducts); // Aquí usamos use para obtener el valor de la promesa
 
   return (
@@ -13,8 +13,8 @@ export function RecommendedProducts({ recommendedProducts }: {recommendedProduct
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {recommendedProductsData.map((product) => (
           <ProductCard
-            key={product.id} 
-            product={product} 
+            key={product.id}
+            product={product}
           />
         ))}
       </div>

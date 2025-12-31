@@ -8,20 +8,31 @@ import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { createServerFn } from '@tanstack/react-start'
 
+const fetchProductById = createServerFn({ method: 'POST' })
+  .inputValidator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    const { getProductById } = await import('@/data/products')
+    const product = await getProductById(data.id)
+    return product
+  })
 
-
-
-
+const fetchRecommendedProducts = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const { getRecommendedProducts } = await import('@/data/products')
+    return getRecommendedProducts()
+  },
+)
 
 export const Route = createFileRoute('/products/$id')({
   component: RouteComponent,
   loader: async ({ params }) => {
-    const { getRecommendedProducts, getProductById } = await import('@/data/products');
-    const recommendedProducts = getRecommendedProducts(); // Si no ponemos await la función devuelve una promesa
-    const product = await getProductById(params.id)
+    const product = await fetchProductById({ data: { id: params.id } })
     if (!product) {
       throw notFound()
     }
+    // Return recommendedProducts as a Promise for Suspense
+    const recommendedProducts = fetchRecommendedProducts()
+    console.log('product', product)
     return { product, recommendedProducts }
   },
   head: async ({ loaderData: data }) => {

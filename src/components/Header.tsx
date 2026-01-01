@@ -1,10 +1,25 @@
 import { ShoppingBag } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
+import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
+import { createServerFn } from "@tanstack/react-start"
 
-
+const getCartItemsCount = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const { getCartItemsCount } = await import('@/data/cart.server.ts')
+    const data = await getCartItemsCount()
+    return data
+  },
+)
 
 const Header = () => {
+
+  const { data: cartItemsData } = useQuery({
+    queryKey: ['cart-items-data'],
+    queryFn: () => getCartItemsCount(),
+  })
+
+
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
       <div className="mx-auto max-w-6xl px-4 py-3 items-center justify-between flex">
@@ -41,10 +56,10 @@ const Header = () => {
           >
             <span>Cart</span>
             <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-900 px-2 text-[11px] font-bold text-white">
-              0
+              {cartItemsData?.count ?? 0}
             </span>
             <span className="hidden text-[11px] font-medium tex-slate-500 sm:inline">
-              $100
+              ${cartItemsData?.total.toFixed(2) ?? 0}
             </span>
           </Link>   
         </div>

@@ -32,7 +32,6 @@ export const Route = createFileRoute('/products/$id')({
     }
     // Return recommendedProducts as a Promise for Suspense
     const recommendedProducts = fetchRecommendedProducts()
-    console.log('product', product)
     return { product, recommendedProducts }
   },
   head: async ({ loaderData: data }) => {

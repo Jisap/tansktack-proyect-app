@@ -1,10 +1,12 @@
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
-import { Link } from "@tanstack/react-router"
+import { Link, useRouter } from "@tanstack/react-router"
 import { Button } from "./ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ShoppingBagIcon } from "@hugeicons/core-free-icons"
 import { ProductSelect } from "@/db/schema"
+import { useQueryClient } from "@tanstack/react-query"
+import { mutateCartFn } from "@/routes/cart"
 
 const inventoryTone = {
   'in-stock': 'bg-emerald-50 text-emerald-600 border-emerald-100',
@@ -15,6 +17,10 @@ const inventoryTone = {
 
 
 const ProductCard = ({ product }: { product: ProductSelect }) => {
+  
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  
   return (
     <Link 
       to="/products/$id"
@@ -68,7 +74,18 @@ const ProductCard = ({ product }: { product: ProductSelect }) => {
             onClick={async (e) => {
               console.log('add to cart')
               e.preventDefault()
-              e.stopPropagation()           
+              e.stopPropagation()
+              await mutateCartFn({
+                data: {
+                  action: 'add',
+                  productId: product.id,
+                  quantity: 1,
+                },
+              })
+              await router.invalidate({ sync: true })
+              await queryClient.invalidateQueries({
+                queryKey: ['cart-items-data'],
+              })          
             }}
           >
             <HugeiconsIcon icon={ShoppingBagIcon} size={20} /> Add to Cart

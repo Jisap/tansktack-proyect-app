@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { z } from 'zod'
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Button } from '@/components/ui/button'
 
@@ -15,17 +16,27 @@ const fetchCartItems = createServerFn({ method: 'GET' }).handler(async () => { /
   return data
 })
 
-export const mutateCartFn = createServerFn({ method: 'POST' }) // Función para mutar el carrito
-  .inputValidator((data: MutateCartFnInput) => data)
-  .handler(async ({ data }: { data: MutateCartFnInput }) => {
-    const { addToCart, updateCartItem, removeFromCart, clearCart } =
-      await import('@/data/cart.server.ts')
+const mutateCartSchema = z.object({
+  action: z.enum(['add', 'remove', 'update', 'clear']),
+  productId: z.string().optional(),
+  quantity: z.number().optional(),
+})
+
+export const mutateCartFn = createServerFn({ method: 'POST' })           // Función para mutar el carrito
+  .inputValidator((data: unknown) => mutateCartSchema.parse(data))
+  .handler(async ({ data }) => {
+    const { addToCart, updateCartItem, removeFromCart, clearCart } = await import('@/data/cart.server.ts')
+    
     switch (data.action) {
       case 'add':
+        // Aseguramos que productId y quantity existan para 'add'
+        if (!data.productId || data.quantity === undefined) throw new Error("Missing data for add")
         return await addToCart(data.productId, data.quantity)
       case 'remove':
+        if (!data.productId) throw new Error("Missing productId for remove")
         return await removeFromCart(data.productId)
       case 'update':
+        if (!data.productId || data.quantity === undefined) throw new Error("Missing data for update")
         return await updateCartItem(data.productId, data.quantity)
       case 'clear':
         return await clearCart()
